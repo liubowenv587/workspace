@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/dubbo-api11" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dubbo_api55" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot-thread" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot_anntion_consumer" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot_anntion_provider" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot_consumer" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot_poi" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot_provider" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot_wbqx_consumer" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springboot_wbqx_provider" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springbootdemo" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ssh_lbw_Book" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

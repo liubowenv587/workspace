@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jk.mapper.UserMapper">
+	<select id="findCount" resultType="Integer">
+	select count(1) from a
+	</select>
+	<select id="findUserCount" parameterType="map" resultType="int">
+	select count(1) from(
+	select count(1) from t_user tu 
+	left join t_dept td on tu.dept_id=td.id
+left join t_area tap on tu.provinceCode=tap.id
+left join t_area tac on tu.cityCode=tac.id
+left join t_user_role tur on tu.id=tur.userId
+left join t_role tr  on tur.roleId=tr.id
+
+<include refid="userWhere"></include>
+group by tu.id)a
+	</select>
+	<select id="findUserList" parameterType="map" resultType="com.jk.model.UserBean">
+		select tu.*,td.name as deptName,tap.name as provinceName,tac.name as cityName,group_concat(tr.name) as roleName from t_user tu
+		left join t_dept td on tu.dept_id=td.id
+		left join t_area tap on tu.provinceCode=tap.id
+		left join t_area tac on tu.cityCode=tac.id
+		left join t_user_role tur on tu.id=tur.userId
+		left join t_role tr  on tur.roleId=tr.id
+
+		<include refid="userWhere"></include>
+		group by tu.id
+	limit #{startIndex,jdbcType=NUMERIC},#{endIndex,jdbcType=NUMERIC}
+	</select>
+	<sql id="userWhere">
+    <where>
+      <if test="userBean.account !=null and userBean.account !=''">
+        and tu.account = #{userBean.account}
+      </if>
+      <if test="userBean.deptId !=null and userBean.deptId !=1">
+        and tu.dept_id =#{userBean.deptId}
+      </if>
+      
+    </where>
+  </sql>
+  <insert id="saveUser" parameterType="com.jk.model.UserBean" useGeneratedKeys="true" keyProperty="id">
+	insert into t_user(account,password,dept_id,age,sex,status,createTime,provinceCode,cityCode) values(
+	#{account},#{password},#{deptId},#{age},#{sex},0,now(),#{provinceCode},#{cityCode})
+	</insert>
+	<delete id="delRoleByIds" parameterType="int">
+		delete from t_role where id !=1 and id in
+		<foreach collection="array" item="item" index="index" open="(" close=")" separator=",">
+		#{item}
+		</foreach>
+	</delete>
+	<insert id="saveUserRole" parameterType="com.jk.model.UserRoleBean">
+		insert into t_user_role(userId,roleId) values
+		<foreach collection="list" item="item" index="index"  separator="," >
+			(#{item.userId},#{item.roleId})
+		</foreach>
+	</insert>
+	<!-- 新增权限 -->
+	<insert id="saveRolePower" parameterType="com.jk.model.RolePowerBean">
+		insert into t_role_power (roleId,powerId) values
+		<foreach collection="list" index="index" item="item" separator=",">
+		(#{item.roleId},#{item.powerId})
+		</foreach>
+	</insert>
+	
+	<select id="findPowerMenuList" parameterType="com.jk.model.PowerMenuBean" resultType="com.jk.model.PowerMenuBean">
+		select id,name,url,remark,DATE_FORMAT(createTime,'%Y-%m-%d %H:%i:%s') as createTime
+		from t_nav_menu
+		where powerId=#{powerId}
+		 <if test="name !=null and name != ''">
+			and name like '%${name}%'
+		</if> 
+	</select>
+	<delete id="delDetailByIds" parameterType="int" >
+	delete from t_nav_menu where  id in
+		<foreach collection="array" item="item" index="index" open="(" close=")" separator=",">
+		#{item}
+		</foreach>
+	</delete>
+
+	<insert id="addBook" parameterType="java.util.List">
+		insert into t_user(account,password,age,sex,status,createTime,provinceCode,cityCode) values
+		<foreach collection="list" item="l" separator=","  >
+			(#{l.account},#{l.password},#{l.age},#{l.sex},#{l.status},#{l.createTime},#{l.provinceCode},#{l.cityCode})
+
+		</foreach>
+
+	</insert>
+
+
+</mapper>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" href="../js/easyui1.5/themes/bootstrap/easyui.css">
+<link rel="stylesheet" href="../js/easyui1.5/themes/icon.css">
+<script src="../js/easyui1.5/jquery.min.js"></script>
+<script src="../js/easyui1.5/jquery.easyui.min.js"></script>
+<script src="../js/easyui1.5/locale/easyui-lang-zh_CN.js"></script>
+<body>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'west',title:'角色信息' "style="width:30%">
+        <div id="roleToolbar">
+            <table>
+                <tr>
+                    <td>角色名</td>
+                    <td><input type="text" class="easyui-textbox" id="searchRoleName"></td>
+                    <td><a class="easyui-linkbutton" data-options="iconCls:'icon-search'">搜索</a></td>
+                </tr>
+                <tr>
+
+                    <td colspan="3">
+                        <a onclick="openRoleDialog()" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">添加角色</a>
+                        <a onclick="removeRoleMany()"class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">删除角色</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table id="roleTable"></table>
+        <div id="roleDialog" class="easyui-dialog" data-options="title:'新增角色',modal:true,closed:true,buttons:[
+	{
+		text:'保存',
+		iconCls:'icon-save',
+		handler:function(){
+		saveRole();
+		}
+	}]" style="width:500px;height:400px">
+            <form id="roleForm" method="post">
+                <table>
+
+                    <tr>
+                        <td>角色名称</td>
+                        <td><input type="text" name="id" style="display:none;">
+                            <input type="text" class="easyui-textbox" name="name"></td>
+                    </tr>
+                    <tr>
+                        <td>创建时间</td>
+                        <td><input type="datetimebox"  class="easyui-datetimebox" name="createTime"></td>
+                    </tr>
+
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center',title:'权限树',footer:'#footer' ">
+        <input id="hideRoleId" type="text" style="display:none;">
+        <ul id="powerTree"></ul>
+
+        <!-- 右键菜单定义如下： -->
+        <div id="rightMenu" class="easyui-menu" style="width:120px;">
+            <div onclick="append()" data-options="iconCls:'icon-add'">追加</div>
+            <div onclick="remove()" data-options="iconCls:'icon-remove'">移除</div>
+            <div onclick="edit()" data-options="iconCls:'icon-edit'">编辑</div>
+        </div>
+        <div id="rightMenuDialog" class="easyui-dialog" data-options="title:'节点',modal:true,closed:true,plain:true,buttons:[
+	         {
+	           text:'保存',
+	           iconCls:'icon-save',
+	           plain:true,
+	           handler:function(){
+	             savePowerMenu();
+	            }
+	         }
+         ]" style="width:300px;height:200px">
+            <form method="post" id="powerTreeForm">
+                <table>
+                    <tr>
+                        <td>节点名称</td>
+                        <td><input type="text" class="easyui-textbox" name="text"/>
+                            <input type="text" id="hidePowerId" style="display:none;" name="pid"/>
+                            <!-- 修改隐藏id -->
+                            <input type="text"  style="display:none;" name="id"/></td>
+                    </tr>
+                    <tr>
+                        <td>url</td>
+                        <td><input  type="text" class="easyui-textbox" name="url" /></td>
+                    </tr>
+
+                </table>
+            </form>
+
+        </div>
+    </div>
+    <div id="footer">
+        <a onclick="bangding()" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" style="float:right;">绑定</a>
+    </div>
+    <div data-options="region:'east',title:'详细菜单' "style="width:30%">
+        <div id="detailMenuToolBar">
+            <table>
+                <tr>
+                    <td>菜单名</td>
+                    <td>
+                        <input id="searchPowerDetailMenuName" type="text" class="easyui-textbox" ></td>
+                    <td><a onclick="searchPowerDetailMenu()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">搜索</a></td>
+                </tr>
+                <tr>
+
+                    <td colspan="3">
+                        <a onclick="openPowerDetailDialog()" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">添加</a>
+                        <a onclick="removePowerDetail()" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">删除</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table id="detailPowerMenu"></table>
+        <div id="powerDetailDialog" class="easyui-dialog" data-options="title:'详细权限',modal:true,closed:true,buttons:[
+	{
+		text:'保存',
+		iconCls:'icon-save',
+		plain:true,
+		handler:function(){
+		savepowerDetailMenu();
+		}
+	}]" style="width:300px;height:300px">
+            <form id="powerDetailMenuForm" method="post">
+                <table>
+
+                    <tr>
+                        <td>菜单名称</td>
+                        <td><input type="text" id="hidePowerIdDetail"  value="-1" name="powerId">
+                            <input id="pmid" type="text" name="id" >
+                            <input type="text" class="easyui-textbox" name="name"></td>
+                    </tr>
+                    <tr>
+                        <td>菜单地址</td>
+                        <td><input type="text"  class="easyui-textbox" name="url"></td>
+                    </tr>
+                    <tr>
+                        <td>备注</td>
+                        <td><input type="text"  class="easyui-textbox" data-options="multiline:true" style="height:60px" name="remark"></td>
+                    </tr>
+
+                </table>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+</body>
+
+<script type="text/javascript">
+    $(function(){
+        initRoleTable();
+        initPowerTree(-1);
+        detailPowerMenu(-1);
+    })
+    function savepowerDetailMenu(){
+        $("#powerDetailMenuForm").form('submit',{
+            url:'../user/savePowerDetailMenu',
+            onSubmit:function(){
+                var powerId=$("#hidePowerIdDetail").val();
+                if (powerId==-1) {
+                    $.messager.alert('提示','请双击选择权限树节点','info');
+                    return false;
+
+                }
+                return true;
+            },
+            success:function(data){
+                if (data) {
+                    //查询刷新
+                    searchPowerDetailMenu();
+                    closePowerDetailDialog();
+                }else{
+                    $.messager.alert('提示','保存失败','error');
+                }
+            }
+        })
+    }
+    function closePowerDetailDialog(){
+        $("#powerDetailDialog").dialog('close');
+    }
+    //新增
+    function openPowerDetailDialog(){
+        //重置后保留权限id
+        var powerId=$("#hidePowerIdDetail").val();
+        $("#powerDetailMenuForm").form('reset');
+        $("#hidePowerIdDetail").val(powerId);
+
+        $("#powerDetailDialog").dialog('open');
+
+    }
+    //详细条查
+
+    function searchPowerDetailMenu(){
+        var powerId=$("#hidePowerIdDetail").val();
+        var name=$("#searchPowerDetailMenuName").textbox('getValue');
+        $("#detailPowerMenu").datagrid('load',{
+            powerId:powerId,
+            name:name
+        })
+    }
+
+    function detailPowerMenu(powerId){
+        $("#detailPowerMenu").datagrid({
+            url:'../user/findPowerMenuList',
+            queryParams:{powerId:powerId},
+            toolbar:'#detailMenuToolBar',
+            fit:true,
+            columns:[
+                [
+                {field:'id',checkbox:true},
+                {field:'name',title:'菜单名称'},
+                {field:'url',title:'菜单地址'},
+                {field:'createTime',title:'创建时间'},
+                {field:'remark',title:'备注'},
+                {field:'cz',title:'操作',formatter:function(value,row,index){
+                        return '<a href="javascript:openEditDetailDialog('+row.id+');">修改</a>';
+                    }},
+            ]
+            ]
+        })
+    }
+    //修改回显
+    function openEditDetailDialog(id){
+        $("#pmid").val(id);
+        $.post('../user/findDetailInfoById',{id:id},function(data){
+            alert(data)
+            $("#powerDetailMenuForm").form('load',data);
+
+        })
+        $("#powerDetailDialog").dialog('open');
+    }
+    //新增角色
+    function openRoleDialog(){
+        $("#roleForm").form('reset')
+
+
+        $("#roleDialog").dialog('open');
+    }
+    function saveRole(){
+
+        $("#roleForm").form('submit',{
+            url:'../user/saveRole',
+            onSubmit:function(){
+
+
+            },
+            success:function(data){
+                data =JSON.parse(data);
+                if (data) {
+                    closeRoleDialog();
+
+                    $("#roleTable").datagrid('reload');
+                }else{
+                    $.messager.alert('提示','保存失败','error');
+                }
+            }
+        })
+    }
+    function closeRoleDialog(){
+        $("#roleDialog").dialog('close');
+    }
+
+
+
+    //修改节点
+    function edit(){
+        var powerNode=$("#powerTree").tree('getSelected');
+        var powerId=powerNode.id;
+        $.post('../nav/findPowerInfo',{powerId:powerId},
+            function(data){
+                $("#powerTreeForm").form('load',data);
+                //修改打开弹框
+                $("#rightMenuDialog").dialog({
+                    title:'编辑节点',
+                    closed:false
+                })
+            })
+    }
+
+    //移除节点
+    function remove(){
+        var powerNode=$("#powerTree").tree('getSelected');
+        var powerId=powerNode.id;
+        $.post('../nav/delPowerNode',{
+            powerId:powerId
+        },function(data){
+            if (data) {
+                var roleId=($("#hidePowerId").val()==''||$("#hidePowerId").val()==null)?-1:$("#hidePowerId").val();
+
+                initPowerTree(roleId);
+
+            }else {
+                $.messager.alert('提示','移除失败','error');
+            }
+        })
+    }
+    //新增节点
+    function savePowerMenu(){
+
+
+        $("#powerTreeForm").form('submit',{
+            url:'../nav/savePower',
+            success:function(data){
+                data=JSON.parse(data);
+                if (data) {
+                    //获取当前角色id，并刷新
+                    var roleId=($("#hidePowerId").val()==''||$("#hidePowerId").val()==null)?-1:$("#hidePowerId").val();
+
+                    initPowerTree(roleId);
+                    closeRightMenuDialog();
+                }else {
+                    $.messager.alert('提示','新增节点失败','error');
+                }
+            }
+        })
+
+
+    }
+    function closeRightMenuDialog(){
+        $("#rightMenuDialog").dialog('close');
+    }
+
+    function append(){
+        var powerNode=$("#powerTree").tree('getSelected');
+
+        $("#powerTreeForm").form('reset');
+        $("#hidePowerId").val(powerNode.id);
+        //添加打开弹框
+        $("#rightMenuDialog").dialog({
+            title:'新增节点',
+            closed:false
+        })
+
+    }
+
+
+
+
+
+
+    function bangding(){
+        var roleId=$("#hideRoleId").val();
+        var powers=$("#powerTree").tree('getChecked');
+        var ids="";
+        for (var i = 0; i < powers.length; i++) {
+            ids+=ids==""?powers[i].id:","+powers[i].id;
+        }
+        $.post('../user/saveRolePower',{roleId:roleId,powerIds:ids},function(data){
+            var msg=data?"绑定成功":"绑定失败";
+            $.messager.alert("提示",msg,'info');
+
+        })
+    }
+    function bangdingPower(roleId){
+        $("#hideRoleId").val(roleId);
+        initPowerTree(roleId)
+    }
+    function initPowerTree(roleId){
+        $("#powerTree").tree({
+            url:'../user/findRolePower?roleId='+roleId,
+            checkbox:true,
+            // 右键点击节点并显示快捷菜单
+            onContextMenu: function(e, node){
+                e.preventDefault();
+                // 查找节点
+                $('#powerTree').tree('select', node.target);
+                // 显示快捷菜单
+                $('#rightMenu').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            },
+            onDblClick:function(node){
+                //查询详细菜单
+                detailPowerMenu(node.id);
+                $("#hidePowerIdDetail").val(node.id);
+            }
+        })
+    }
+    //条查
+    function searchBtn(){
+
+        $("#roleTable").datagrid('load',{
+            name:$("#searchRoleName").textbox('getValue'),
+
+            /* provinceCode:$("#searchPronvice").combobox('getValue'),
+            cityCode:$("#searchCity").combobox('getValue') */
+
+        })
+    }
+    function removeRoleMany(){
+
+        var roles=$("#roleTable").datagrid('getSelections');
+        var ids='';
+        for (var i = 0; i < roles.length; i++) {
+            if (roles[i].id==1) {
+                $.messager.alert('提示','超级管理员不可以被删除','warning');
+                return;
+            }
+            ids += ids == ''?roles[i].id:","+roles[i].id;
+            alert(ids)
+        }
+        $.post('../user/delRoleByIds',{ids:ids},function(data){
+            if (data) {
+                $("#roleTable").datagrid('reload');
+            }else{
+                $.messager.alert('提示','删除失败','warning');
+            }
+        })
+
+    }
+    //删除详细菜单
+
+
+    function removePowerDetail(){
+        var powers=$("#detailPowerMenu").datagrid('getSelections');
+    debugger
+        var ids='';
+        for (var i = 0; i < powers.length; i++) {
+
+            ids += ids == ''?powers[i].id:","+powers[i].id;
+            alert(ids)
+        }
+        $.post('../user/delDetailByIds',{ids:ids},function(data){
+            if (data) {
+                $("#detailPowerMenu").datagrid('reload');
+            }else{
+                $.messager.alert('提示','删除失败','warning');
+            }
+        })
+
+    }
+    function initRoleTable(){
+
+        $("#roleTable").datagrid({
+            url:'../user/findRoleList',
+            fit:true,
+            columns:[
+                [
+                {field:'id',checkbox:true},
+                {field:'name',title:'角色名称'},
+                {field:'createTime',title:'创建时间'},
+                {field:'cz',title:'操作',formatter:function(value,row,index){
+                        return '<a href="javascript:bangdingPower('+row.id+');">绑定权限</a>'
+                    }}
+
+            ]
+            ]
+        })
+    }
+    function exportExcel() {
+        location.href="../user/exportExcel";
+    }
+</script>
+</html>
