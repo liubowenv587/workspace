@@ -14,7 +14,7 @@
   <url>http://www.example.com</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring.version>4.1.4.RELEASE</spring.version>
+    <spring.version>5.2.7.RELEASE</spring.version>
   </properties>
   <dependencies>
     <!-- 加入struts2依赖包 -->
